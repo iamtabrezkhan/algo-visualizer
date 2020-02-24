@@ -1,4 +1,13 @@
-import { generateRandomArray, delay } from "../../utils/index.js";
+import {
+  generateRandomArray,
+  delay,
+  disableActionButtons,
+  enableActionButtons,
+  removeSwappingColors,
+  addSwappingColors,
+  swapBars,
+  createAndInsertBar
+} from "../../utils/index.js";
 
 const SelectionSort = {
   render: async function() {
@@ -24,7 +33,6 @@ const SelectionSort = {
   },
   componentDidMount: function() {
     window.animationStart = false;
-    console.log(`Selection Sort Mounted`);
     generateRandomBars(window.barWidth);
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
@@ -46,12 +54,10 @@ async function* sortGenerator(arr) {
   let awaitTime = 0;
   for (let i = 0; i < arr.length; i++) {
     if (!window.animationStart) {
-      console.log("stop selection sort animation");
       break;
     }
     let min = i;
     for (let j = i + 1; j < arr.length; j++) {
-      console.log(`min is: ${min}`);
       if (arr[min] > arr[j]) {
         awaitTime = yield {
           min: min,
@@ -98,26 +104,12 @@ function generateRandomBars(width) {
     ".algo-container .bars-container .wrapper"
   );
   barsContainer.innerHTML = "";
+  let barsWrapper = document.querySelector(".bars-container .wrapper");
+  let maxHeight = Math.max(...window.randomArray);
+  barsWrapper.style.height = `${maxHeight * 4 + 20}px`;
   window.randomArray.forEach((v, i) => {
-    let barsWrapper = document.querySelector(".bars-container .wrapper");
-    let maxHeight = Math.max(...randomArray);
-    barsWrapper.style.height = `${maxHeight * 4 + 20}px`;
-    let barContainer = document.createElement("div");
-    barContainer.className = "bar-container";
-    barContainer.style.width = `${width}px`;
-    barContainer.style.left = `${i * width + 10}px`;
-    let bar = document.createElement("div");
-    bar.className = `bar${i} bar`;
-    bar.style.height = `${v * 4}px`;
-    let elementValue = document.createElement("div");
-    elementValue.className = "value";
-    elementValue.innerText = v;
-    barContainer.appendChild(bar);
-    barContainer.appendChild(elementValue);
-    barsContainer.appendChild(barContainer);
+    createAndInsertBar(barsContainer, width, v, i);
   });
-  let minPointer = generateMinPointerElement();
-  barsContainer.appendChild(minPointer);
 }
 
 function generateMinPointerElement() {
@@ -131,9 +123,23 @@ function generateMinPointerElement() {
   return minPointer;
 }
 
+function removeMinPointer() {
+  let parent = document.querySelector(
+    ".algo-container .bars-container .wrapper"
+  );
+  let oldChild = document.querySelector(".min-pointer");
+  if (oldChild) parent.removeChild(oldChild);
+}
+
 async function animate() {
   window.animationStart = true;
   disableActionButtons();
+  removeMinPointer();
+  let minPointer = generateMinPointerElement();
+  let barsContainer = document.querySelector(
+    ".algo-container .bars-container .wrapper"
+  );
+  barsContainer.appendChild(minPointer);
   let sorter = sortGenerator(window.randomArray);
   let v = await sorter.next(window.delayTime);
   while (!v.done) {
@@ -142,31 +148,22 @@ async function animate() {
     }
     let { min, y, canSwap, changeMin } = v.value;
     removeSwappingColors();
-    console.log(v.value);
-    let minPointer = document.querySelector(".min-pointer");
     if (y < window.randomArray.length) {
       let barX = document.querySelector(`.selectionSort .bar${min}`);
       let barY = document.querySelector(`.selectionSort .bar${y}`);
-      let barXContainer = barX.parentElement;
-      let barYContainer = barY.parentElement;
-      barXContainer.style.transitionDuration = `${window.delayTime}ms`;
-      barYContainer.style.transitionDuration = `${window.delayTime}ms`;
-      barX.classList.add("swapping");
-      barY.classList.add("swapping");
+      addSwappingColors(barX, barY);
       if (canSwap) {
-        let barXContainerLeft = barXContainer.style.left;
-        let barYContainerLeft = barYContainer.style.left;
-        barXContainer.style.left = barYContainerLeft;
-        barYContainer.style.left = barXContainerLeft;
+        swapBars(barX, barY, min, y);
         await delay(window.delayTime);
-        barX.className = `bar${y} bar swapping`;
-        barY.className = `bar${min} bar swapping`;
         minPointer.style.left = `${window.barWidth * y + 20}px`;
+        await delay(window.delayTime);
+      } else {
         await delay(window.delayTime);
       }
       if (changeMin) {
         minPointer.style.transitionDuration = `${window.delayTime}ms`;
-        minPointer.style.left = `${parseInt(barYContainer.style.left) - 10}px`;
+        minPointer.style.left = `${parseInt(barY.parentElement.style.left) -
+          10}px`;
         await delay(window.delayTime);
       }
     }
@@ -174,27 +171,6 @@ async function animate() {
   }
   enableActionButtons();
   removeSwappingColors();
-}
-
-function removeSwappingColors() {
-  let activeBars = document.querySelectorAll(".swapping");
-  for (let i = 0; i < activeBars.length; i++) {
-    activeBars[i].classList.remove("swapping");
-  }
-}
-
-function disableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  animateButton.disabled = true;
-  randomizeButton.disabled = true;
-}
-
-function enableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  animateButton.disabled = false;
-  randomizeButton.disabled = false;
 }
 
 export default SelectionSort;

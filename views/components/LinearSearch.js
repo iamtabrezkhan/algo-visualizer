@@ -1,4 +1,14 @@
-import { generateRandomArray, delay } from "../../utils/index.js";
+import {
+  generateRandomArray,
+  delay,
+  disableActionButtons,
+  enableActionButtons,
+  createAndInsertElement,
+  createAndInsertPointer,
+  movePointer,
+  startBlinkingGreen,
+  startBlinkingRed
+} from "../../utils/index.js";
 
 const LinearSearch = {
   render: async function() {
@@ -82,31 +92,16 @@ function generateRandomElements(width) {
   boxesContainer.innerHTML = "";
   window.randomArray = generateRandomArray(5, 40);
   window.randomArray.forEach((v, i) => {
-    let elementBox = document.createElement("div");
-    elementBox.className = `box${i} el-box`;
-    elementBox.style.width = `${width}px`;
-    elementBox.style.height = `${width}px`;
-    elementBox.innerText = v;
-    boxesContainer.appendChild(elementBox);
+    createAndInsertElement(boxesContainer, width, v, i);
   });
-  let pointer = generatePointer();
-  boxesContainer.appendChild(pointer);
 }
 
-function generatePointer() {
-  let boxesContainer = document.querySelector(
+function removePointer() {
+  let parent = document.querySelector(
     ".algo-container .bars-container .wrapper"
   );
-  let pointer = document.createElement("div");
-  pointer.id = "pointer";
-  let wrapper = document.createElement("div");
-  wrapper.className = "wrapper";
-  pointer.appendChild(wrapper);
-  pointer.style.width = `${window.elementWidth}px`;
-  pointer.style.left = `${getElementPosition(0).left}px`;
-  pointer.style.bottom = `${getElementPosition(0).bottom + 35}px`;
-  console.log(pointer);
-  return pointer;
+  let oldChild = document.querySelector("#pointer");
+  if (oldChild && parent) parent.removeChild(oldChild);
 }
 
 function getElementPosition(i) {
@@ -135,48 +130,29 @@ async function animate() {
   window.animationStart = true;
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
-  let pointer = document.querySelector("#pointer");
-  pointer.childNodes[0].innerText = `${elToFind}?`;
+  removePointer();
+  let pointer = createAndInsertPointer(
+    `${elToFind}?`,
+    getElementPosition(0).left,
+    getElementPosition(0).bottom
+  );
   let v = await sorter.next(window.delayTime);
   while (!v.done) {
     if (!window.animationStart) {
       return;
     }
-    pointer.style.opacity = "1";
     let { found, isPresent, el, i } = v.value;
-    pointer.style.transitionDuration = `${window.delayTime}ms`;
     let { left, bottom } = getElementPosition(i);
-    pointer.style.left = `${left}px`;
-    pointer.style.bottom = `${bottom + 35}px`;
+    movePointer(pointer, left, bottom);
     await delay(window.delayTime);
     if (found) {
-      pointer.classList.add("blinkSuccess");
-      pointer.classList.remove("blinkError");
+      startBlinkingGreen(pointer);
     } else {
-      pointer.classList.add("blinkError");
-      pointer.classList.remove("blinkSuccess");
+      startBlinkingRed(pointer);
     }
     v = await sorter.next(window.delayTime);
   }
   enableActionButtons();
-}
-
-function disableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  let searchInput = document.querySelector("#searchElement");
-  animateButton.disabled = true;
-  randomizeButton.disabled = true;
-  searchInput.disabled = true;
-}
-
-function enableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  let searchInput = document.querySelector("#searchElement");
-  animateButton.disabled = false;
-  randomizeButton.disabled = false;
-  searchInput.disabled = false;
 }
 
 export default LinearSearch;

@@ -1,4 +1,13 @@
-import { generateRandomArray, delay } from "../../utils/index.js";
+import {
+  generateRandomArray,
+  delay,
+  disableActionButtons,
+  enableActionButtons,
+  addSwappingColors,
+  removeSwappingColors,
+  swapBars,
+  createAndInsertBar
+} from "../../utils/index.js";
 
 const BubbleSort = {
   render: async function() {
@@ -73,23 +82,11 @@ function generateRandomBars(width) {
     ".algo-container .bars-container .wrapper"
   );
   barsContainer.innerHTML = "";
+  let barsWrapper = document.querySelector(".bars-container .wrapper");
+  let maxHeight = Math.max(...randomArray);
+  barsWrapper.style.height = `${maxHeight * 4 + 20}px`;
   window.randomArray.forEach((v, i) => {
-    let barsWrapper = document.querySelector(".bars-container .wrapper");
-    let maxHeight = Math.max(...randomArray);
-    barsWrapper.style.height = `${maxHeight * 4 + 20}px`;
-    let barContainer = document.createElement("div");
-    barContainer.className = "bar-container";
-    barContainer.style.width = `${width}px`;
-    barContainer.style.left = `${i * width + 10}px`;
-    let bar = document.createElement("div");
-    bar.className = `bar${i} bar`;
-    bar.style.height = `${v * 4}px`;
-    let elementValue = document.createElement("div");
-    elementValue.className = "value";
-    elementValue.innerText = v;
-    barContainer.appendChild(bar);
-    barContainer.appendChild(elementValue);
-    barsContainer.appendChild(barContainer);
+    createAndInsertBar(barsContainer, width, v, i);
   });
 }
 
@@ -107,46 +104,18 @@ async function animate() {
     if (y < window.randomArray.length) {
       let barX = document.querySelector(`.bubbleSort .bar${x}`);
       let barY = document.querySelector(`.bubbleSort .bar${y}`);
-      let barXContainer = barX.parentElement;
-      let barYContainer = barY.parentElement;
-      barXContainer.style.transitionDuration = `${window.delayTime}ms`;
-      barYContainer.style.transitionDuration = `${window.delayTime}ms`;
-      barX.classList.add("swapping");
-      barY.classList.add("swapping");
+      addSwappingColors(barX, barY);
       if (canSwap) {
         await delay(window.delayTime);
-        let barXContainerLeft = barXContainer.style.left;
-        let barYContainerLeft = barYContainer.style.left;
-        barXContainer.style.left = barYContainerLeft;
-        barYContainer.style.left = barXContainerLeft;
-        barX.className = `bar${y} bar swapping`;
-        barY.className = `bar${x} bar swapping`;
+        swapBars(barX, barY, x, y);
+        await delay(window.delayTime);
+      } else {
+        await delay(window.delayTime);
       }
     }
     v = await sorter.next(window.delayTime);
   }
   enableActionButtons();
-}
-
-function removeSwappingColors() {
-  let activeBars = document.querySelectorAll(".swapping");
-  for (let i = 0; i < activeBars.length; i++) {
-    activeBars[i].classList.remove("swapping");
-  }
-}
-
-function disableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  animateButton.disabled = true;
-  randomizeButton.disabled = true;
-}
-
-function enableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  animateButton.disabled = false;
-  randomizeButton.disabled = false;
 }
 
 export default BubbleSort;

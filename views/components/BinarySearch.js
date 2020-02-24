@@ -1,4 +1,14 @@
-import { generateRandomArray, delay } from "../../utils/index.js";
+import {
+  generateRandomArray,
+  delay,
+  disableActionButtons,
+  enableActionButtons,
+  createAndInsertElement,
+  createAndInsertPointer,
+  movePointer,
+  startBlinkingGreen,
+  startBlinkingRed
+} from "../../utils/index.js";
 
 const BinarySearch = {
   render: async function() {
@@ -96,27 +106,8 @@ function generateRandomElements(width) {
   window.randomArray = generateRandomArray(12, 40);
   window.randomArray = window.randomArray.sort((a, b) => a - b);
   window.randomArray.forEach((v, i) => {
-    let elementBox = document.createElement("div");
-    elementBox.className = `box${i} el-box`;
-    elementBox.style.width = `${width}px`;
-    elementBox.style.height = `${width}px`;
-    elementBox.innerText = v;
-    boxesContainer.appendChild(elementBox);
+    createAndInsertElement(boxesContainer, width, v, i);
   });
-  generateThreePointers();
-}
-
-function generatePointer() {
-  let boxesContainer = document.querySelector(
-    ".algo-container .bars-container .wrapper"
-  );
-  let pointer = document.createElement("div");
-  pointer.id = "pointer";
-  let wrapper = document.createElement("div");
-  wrapper.className = "wrapper";
-  pointer.appendChild(wrapper);
-  pointer.style.width = `${window.elementWidth}px`;
-  return pointer;
 }
 
 function getElementPosition(i) {
@@ -134,31 +125,40 @@ function getElementPosition(i) {
 }
 
 function generateThreePointers() {
-  let midPointer = generatePointer();
-  midPointer.className = "mid";
-  let lowPointer = generatePointer();
-  lowPointer.childNodes[0].innerText = "low";
-  lowPointer.className = "low";
-  let highPointer = generatePointer();
-  highPointer.childNodes[0].innerText = "high";
-  highPointer.className = "high";
   let midElPos = getElementPosition(
     Math.floor((0 + (window.randomArray.length - 1)) / 2)
   );
   let lowElPos = getElementPosition(0);
   let highElPos = getElementPosition(window.randomArray.length - 1);
-  midPointer.style.left = `${midElPos.left}px`;
-  midPointer.style.bottom = `${midElPos.bottom}px`;
-  lowPointer.style.left = `${lowElPos.left}px`;
-  lowPointer.style.bottom = `${lowElPos.bottom}px`;
-  highPointer.style.left = `${highElPos.left}px`;
-  highPointer.style.bottom = `${highElPos.bottom}px`;
+  let midPointer = createAndInsertPointer(
+    "",
+    midElPos.left,
+    midElPos.bottom - 35
+  );
+  midPointer.className = "mid";
+  let lowPointer = createAndInsertPointer(
+    "low",
+    lowElPos.left,
+    lowElPos.bottom - 35
+  );
+  lowPointer.className = "low";
+  let highPointer = createAndInsertPointer(
+    "high",
+    highElPos.left,
+    highElPos.bottom - 35
+  );
+  highPointer.className = "high";
   let boxesContainer = document.querySelector(
     ".algo-container .bars-container .wrapper"
   );
   boxesContainer.appendChild(midPointer);
   boxesContainer.appendChild(lowPointer);
   boxesContainer.appendChild(highPointer);
+  return {
+    midPointer,
+    lowPointer,
+    highPointer
+  };
 }
 
 function removeOldThreePointers() {
@@ -182,23 +182,16 @@ async function animate() {
     return;
   }
   removeOldThreePointers();
-  generateThreePointers();
+  let { midPointer, lowPointer, highPointer } = generateThreePointers();
   window.animationStart = true;
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
-  let midPointer = document.querySelector(".mid");
-  let lowPointer = document.querySelector(".low");
-  let highPointer = document.querySelector(".high");
   midPointer.childNodes[0].innerText = `${elToFind}?`;
-  midPointer.style.opacity = "1";
-  lowPointer.style.opacity = "1";
-  highPointer.style.opacity = "1";
   let v = await sorter.next(window.delayTime);
   while (!v.done) {
     if (!window.animationStart) {
       return;
     }
-    console.log(v.value);
     let { found, low, high, mid, moveLow, moveHigh } = v.value;
     if (
       low >= 0 &&
@@ -206,78 +199,47 @@ async function animate() {
       high >= 0 &&
       high <= window.randomArray.length - 1
     ) {
-      midPointer.style.transitionDuration = `${window.delayTime}ms`;
-      lowPointer.style.transitionDuration = `${window.delayTime}ms`;
-      highPointer.style.transitionDuration = `${window.delayTime}ms`;
       let lowPos = getElementPosition(low);
       let highPos = getElementPosition(high);
       let midPos = getElementPosition(mid);
       await delay(window.delayTime);
       if (moveLow) {
-        console.log("moving low");
-        midPointer.classList.add("blinkError");
-        midPointer.classList.remove("blinkSuccess");
-        lowPointer.style.left = `${lowPos.left}px`;
-        lowPointer.style.bottom = `${lowPos.bottom}px`;
+        startBlinkingRed(midPointer);
+        movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
         await delay(window.delayTime);
-        midPointer.style.left = `${midPos.left}px`;
-        midPointer.style.bottom = `${midPos.bottom}px`;
+        await delay(window.delayTime / 2);
+        movePointer(midPointer, midPos.left, midPos.bottom - 35);
         await delay(window.delayTime);
       } else if (moveHigh) {
-        console.log("moving high");
-        midPointer.classList.add("blinkError");
-        midPointer.classList.remove("blinkSuccess");
-        highPointer.style.left = `${highPos.left}px`;
-        highPointer.style.bottom = `${highPos.bottom}px`;
+        startBlinkingRed(midPointer);
         await delay(window.delayTime);
-        midPointer.style.left = `${midPos.left}px`;
-        midPointer.style.bottom = `${midPos.bottom}px`;
+        movePointer(highPointer, highPos.left, highPos.bottom - 35);
+        await delay(window.delayTime);
+        await delay(window.delayTime / 2);
+        movePointer(midPointer, midPos.left, midPos.bottom - 35);
         await delay(window.delayTime);
       } else if (found) {
-        console.log("found");
-        lowPointer.style.left = `${lowPos.left}px`;
-        lowPointer.style.bottom = `${lowPos.bottom}px`;
-        highPointer.style.left = `${highPos.left}px`;
-        highPointer.style.bottom = `${highPos.bottom}px`;
-        midPointer.style.left = `${midPos.left}px`;
-        midPointer.style.bottom = `${midPos.bottom}px`;
-        midPointer.classList.remove("blinkError");
-        midPointer.classList.add("blinkSuccess");
+        movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
+        movePointer(highPointer, highPos.left, highPos.bottom - 35);
+        movePointer(midPointer, midPos.left, midPos.bottom - 35);
+        startBlinkingGreen(midPointer);
         await delay(window.delayTime);
         lowPointer.style.display = "none";
         highPointer.style.display = "none";
+      } else {
+        await delay(window.delayTime);
       }
-      //   await delay(window.delayTime);
     } else {
       console.log("not found");
       lowPointer.style.display = "none";
       highPointer.style.display = "none";
-      midPointer.classList.add("blinkError");
-      midPointer.classList.remove("blinkSuccess");
+      startBlinkingRed(midPointer);
       midPointer.style.width = "auto";
       midPointer.childNodes[0].innerText = `${elToFind} is not present in array!`;
     }
     v = await sorter.next(window.delayTime);
   }
   enableActionButtons();
-}
-
-function disableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  let searchInput = document.querySelector("#searchElement");
-  animateButton.disabled = true;
-  randomizeButton.disabled = true;
-  searchInput.disabled = true;
-}
-
-function enableActionButtons() {
-  let animateButton = document.querySelector(".animateBtn");
-  let randomizeButton = document.querySelector(".randomizeBtn");
-  let searchInput = document.querySelector("#searchElement");
-  animateButton.disabled = false;
-  randomizeButton.disabled = false;
-  searchInput.disabled = false;
 }
 
 export default BinarySearch;
