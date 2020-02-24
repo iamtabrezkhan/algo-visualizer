@@ -2,7 +2,7 @@ import BubbleSort from "../components/BubbleSort.js";
 import SelectionSort from "../components/SelectionSort.js";
 import LinearSearch from "../components/LinearSearch.js";
 import BinarySearch from "../components/BinarySearch.js";
-import { checkIfAlreadyMounted } from "../../utils/index.js";
+import { checkIfAlreadyMounted } from "../../utils/common.js";
 
 const Visualizer = {
   render: async function() {

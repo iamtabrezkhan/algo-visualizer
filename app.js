@@ -1,4 +1,4 @@
-import { insertComponent, getElementById } from "./utils/index.js";
+import { insertComponent, getElementById } from "./utils/common.js";
 import router from "./js/router.js";
 
 let contentDiv = getElementById("content");

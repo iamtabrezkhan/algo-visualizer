@@ -2,12 +2,14 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons,
+  enableActionButtons
+} from "../../utils/common.js";
+import {
   addSwappingColors,
   removeSwappingColors,
   swapBars,
   createAndInsertBar
-} from "../../utils/index.js";
+} from "../../utils/sorting.js";
 
 const BubbleSort = {
   render: async function() {
