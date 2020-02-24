@@ -2,7 +2,7 @@ import Home from "../views/pages/Home.js";
 import About from "../views/pages/About.js";
 import Visualizer from "../views/pages/Visualizer.js";
 import Error404 from "../views/pages/Error404.js";
-import { insertComponent, checkIfAlreadyMounted } from "../utils/index.js";
+import { insertComponent, checkIfAlreadyMounted } from "../utils/common.js";
 
 const routes = {
   // "/": Home,

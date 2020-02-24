@@ -2,13 +2,15 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons,
+  enableActionButtons
+} from "../../utils/common.js";
+import {
   createAndInsertElement,
   createAndInsertPointer,
   movePointer,
   startBlinkingGreen,
   startBlinkingRed
-} from "../../utils/index.js";
+} from "../../utils/searching.js";
 
 const LinearSearch = {
   render: async function() {
