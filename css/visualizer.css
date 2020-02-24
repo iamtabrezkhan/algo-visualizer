@@ -1,0 +1,234 @@
+.visualizer {
+  width: 100%;
+  padding: 15px 0;
+}
+
+.visualizer .wrapper {
+  width: 100%;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.visualizer .wrapper .algo-container {
+  padding-top: 20px;
+  width: 100%;
+}
+
+.visualizer .wrapper .types {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.visualizer .wrapper .title {
+  color: var(--color-gray);
+  font-weight: bold;
+  padding-bottom: 10px;
+}
+
+.visualizer .wrapper button {
+  padding: 8px 16px;
+  text-transform: uppercase;
+  background: white;
+  border: 1px solid #ddd;
+  transition: all ease-in-out 0.1s;
+}
+
+.visualizer .wrapper .active-algo-type {
+  background: var(--color-pink);
+  color: white;
+  border: 1px solid transparent;
+  box-shadow: 1px 1px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.visualizer .algo-container .wrapper {
+  border: 1px solid #ddd;
+  padding: 0 10px;
+  width: calc(100% - 22px);
+}
+
+.visualizer .algo-container .wrapper .title {
+  font-size: 0.9rem;
+  font-weight: normal;
+  padding-top: 10px;
+}
+
+.visualizer .algo-container .bars-container {
+  width: calc(100% - 20px);
+  padding: 0 10px;
+}
+
+.visualizer .algo-container .bars-container .wrapper {
+  border: none;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  position: relative;
+  padding: 20px 0;
+  padding-bottom: 40px;
+}
+
+.visualizer .algo-container .bars-container .wrapper .bar-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: absolute;
+  bottom: 40px;
+  transition: all linear;
+}
+
+.visualizer .algo-container .bars-container .wrapper .bar-container .bar {
+  width: 70%;
+  background: var(--color-purple);
+}
+
+.visualizer .algo-container .bars-container .wrapper .bar-container .value {
+  font-size: 0.9rem;
+}
+
+.bar-container .swapping {
+  background: var(--color-pink) !important;
+}
+
+.visualizer .actions {
+  width: 100%;
+  padding: 15px 0;
+  padding-top: 25px;
+}
+
+.visualizer .actions button {
+  background: var(--color-purple);
+  color: white;
+  border: 1px solid transparent;
+  box-shadow: 1px 2px 6px -2px rgba(0, 0, 0, 0.3);
+}
+
+.visualizer .selectionSort .min-pointer {
+  position: absolute;
+  z-index: 2;
+  bottom: 0;
+  background: var(--color-gray);
+  color: white;
+  font-size: 0.8rem;
+  width: 40px;
+  transition: all linear 1s;
+}
+
+.visualizer .selectionSort .min-pointer .wrapper {
+  border: none;
+  padding: 0;
+  position: relative;
+  padding: 5px;
+  width: auto;
+  justify-content: center;
+}
+
+.visualizer .selectionSort .min-pointer .wrapper::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color-gray);
+  transform: rotateZ(45deg);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: -1;
+  top: -5px;
+}
+
+.visualizer .linearSearch .wrapper .el-box,
+.visualizer .binarySearch .wrapper .el-box {
+  border: 1px solid #aaa;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.visualizer .linearSearch .bars-container .wrapper,
+.visualizer .binarySearch .bars-container .wrapper {
+  padding-bottom: 30px;
+}
+
+.visualizer .linearSearch .actions #searchElement,
+.visualizer .binarySearch .actions #searchElement {
+  padding: 8px 16px;
+  outline: none;
+  border: 1px solid #bbb;
+}
+
+.visualizer .linearSearch .actions #searchElement:focus,
+.visualizer .binarySearch .actions #searchElement:focus {
+  padding: 8px 16px;
+  outline: none;
+  border: 1px solid var(--color-purple);
+}
+
+.visualizer .linearSearch #pointer,
+.visualizer .binarySearch #pointer {
+  position: absolute;
+  background: var(--color-gray);
+  color: white;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: all linear 1s;
+}
+
+.visualizer .linearSearch #pointer .wrapper,
+.visualizer .binarySearch #pointer .wrapper {
+  border: none;
+  padding: 0;
+  width: auto;
+  position: relative;
+  padding: 10px;
+  justify-content: center;
+  align-items: center;
+  background: inherit;
+}
+
+.visualizer .linearSearch #pointer .wrapper::after,
+.visualizer .binarySearch #pointer .wrapper::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotateZ(45deg);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: -1;
+  top: -5px;
+}
+
+.visualizer .linearSearch .blinkError,
+.visualizer .binarySearch .blinkError {
+  animation: redBlinker 0.2s linear infinite alternate;
+}
+
+.visualizer .linearSearch .blinkSuccess,
+.visualizer .binarySearch .blinkSuccess {
+  animation: greenBlinker 0.2s linear infinite alternate;
+}
+
+@keyframes redBlinker {
+  from {
+    background: var(--color-gray);
+  }
+  to {
+    background: red;
+  }
+}
+
+@keyframes greenBlinker {
+  from {
+    background: var(--color-gray);
+  }
+  to {
+    background: green;
+  }
+}

@@ -1,0 +1,130 @@
+.section-1 {
+  position: relative;
+}
+
+.section-1::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 10rem;
+  background: var(--color-purple);
+  bottom: 100%;
+  left: 0;
+}
+
+.section-1 img {
+  width: 100%;
+}
+
+.section-1 .wrapper {
+  position: absolute;
+  width: calc(100% - 80px);
+  height: 100%;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 0 40px;
+  max-width: 1240px;
+  right: 0;
+  margin: 0 auto;
+}
+
+.section-1 .wrapper .left {
+  width: 50%;
+}
+
+.section-1 .wrapper .left h2 {
+  color: white;
+  font-weight: bold;
+  font-size: 2.5rem;
+  margin: 0;
+  width: 100%;
+  letter-spacing: 1px;
+}
+
+.section-1 .wrapper .right {
+  width: 50%;
+}
+
+.section-1 .wrapper .right img {
+  animation: wiggle 3s cubic-bezier(0.24, 0.63, 0.57, 0.79) infinite alternate;
+}
+
+.section-1 .get-started {
+  padding: 25px 0;
+}
+
+.section-1 .get-started a {
+  padding: 12px 32px;
+  color: white;
+  background: var(--color-pink);
+  font-weight: bold;
+  box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: all ease-in-out 0.1s;
+}
+
+.section-1 .text {
+  padding: 10px 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: bold;
+}
+
+.section-2 {
+  width: 100%;
+}
+
+.section-2 .wrapper {
+  width: calc(100% - 80px);
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px 40px;
+  padding-top: 100px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.section-2 .wrapper .left,
+.section-2 .wrapper .right {
+  width: 50%;
+}
+
+.section-2 .wrapper .left img {
+  width: 100%;
+  display: block;
+}
+
+.section-2 .wrapper .left .text {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-gray);
+}
+
+@keyframes wiggle {
+  from {
+    transform: translateY(-5px);
+  }
+  to {
+    transform: translateY(5px);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .section-1 .wrapper {
+    top: -50px;
+  }
+}
+
+@media only screen and (min-width: 1420px) {
+  .section-1 .wrapper {
+    width: calc(100% - 160px);
+    padding: 0 80px;
+    top: -100px;
+  }
+}
