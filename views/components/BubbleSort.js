@@ -2,7 +2,9 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  setDelayTime,
+  getDelayTime
 } from "../../utils/common.js";
 import {
   addSwappingColors,
@@ -41,9 +43,9 @@ const BubbleSort = {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
@@ -96,7 +98,7 @@ async function animate() {
   window.animationStart = true;
   disableActionButtons();
   let sorter = sortGenerator(window.randomArray);
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
     if (!window.animationStart) {
       return;
@@ -108,14 +110,14 @@ async function animate() {
       let barY = document.querySelector(`.bubbleSort .bar${y}`);
       addSwappingColors(barX, barY);
       if (canSwap) {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         swapBars(barX, barY, x, y);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
 }

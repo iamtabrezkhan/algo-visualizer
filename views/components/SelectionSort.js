@@ -2,7 +2,9 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  getDelayTime,
+  setDelayTime
 } from "../../utils/common.js";
 import {
   addSwappingColors,
@@ -39,9 +41,9 @@ const SelectionSort = {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
@@ -53,7 +55,7 @@ const SelectionSort = {
 };
 
 async function* sortGenerator(arr) {
-  let awaitTime = 0;
+  let awaitTime = getDelayTime();
   for (let i = 0; i < arr.length; i++) {
     if (!window.animationStart) {
       break;
@@ -120,7 +122,7 @@ function generateMinPointerElement() {
   let minPointerWrapper = document.createElement("div");
   minPointerWrapper.innerText = "min";
   minPointerWrapper.className = "wrapper";
-  minPointer.style.transitionDuration = `${window.delayTime}ms`;
+  minPointer.style.transitionDuration = `${getDelayTime()}ms`;
   minPointer.appendChild(minPointerWrapper);
   return minPointer;
 }
@@ -143,7 +145,7 @@ async function animate() {
   );
   barsContainer.appendChild(minPointer);
   let sorter = sortGenerator(window.randomArray);
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
     if (!window.animationStart) {
       return;
@@ -156,20 +158,20 @@ async function animate() {
       addSwappingColors(barX, barY);
       if (canSwap) {
         swapBars(barX, barY, min, y);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         minPointer.style.left = `${window.barWidth * y + 20}px`;
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
       if (changeMin) {
-        minPointer.style.transitionDuration = `${window.delayTime}ms`;
+        minPointer.style.transitionDuration = `${getDelayTime()}ms`;
         minPointer.style.left = `${parseInt(barY.parentElement.style.left) -
           10}px`;
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
   removeSwappingColors();

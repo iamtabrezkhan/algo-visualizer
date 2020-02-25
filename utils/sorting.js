@@ -1,3 +1,5 @@
+import { getDelayTime } from "./common.js";
+
 /*
 =============================================================================
 utilities functions that are common to sorting algorithms
@@ -18,8 +20,8 @@ export function removeSwappingColors() {
 export function swapBars(barX, barY, x, y) {
   let barXContainer = barX.parentElement;
   let barYContainer = barY.parentElement;
-  barXContainer.style.transitionDuration = `${window.delayTime}ms`;
-  barYContainer.style.transitionDuration = `${window.delayTime}ms`;
+  barXContainer.style.transitionDuration = `${getDelayTime()}ms`;
+  barYContainer.style.transitionDuration = `${getDelayTime()}ms`;
   let barXContainerLeft = barXContainer.style.left;
   let barYContainerLeft = barYContainer.style.left;
   barXContainer.style.left = barYContainerLeft;

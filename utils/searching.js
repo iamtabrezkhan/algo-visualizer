@@ -1,3 +1,5 @@
+import { getDelayTime } from "./common.js";
+
 /*
 =============================================================================
 utilities functions that are common to searching algorithms
@@ -30,7 +32,7 @@ export function createAndInsertPointer(text, left, bottom) {
 }
 
 export function movePointer(pointer, x, y) {
-  pointer.style.transitionDuration = `${window.delayTime}ms`;
+  pointer.style.transitionDuration = `${getDelayTime()}ms`;
   pointer.style.left = `${x}px`;
   pointer.style.bottom = `${y + 35}px`;
 }

@@ -2,7 +2,9 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  getDelayTime,
+  setDelayTime
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
@@ -43,9 +45,9 @@ const BinarySearch = {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
@@ -56,7 +58,7 @@ const BinarySearch = {
 };
 
 async function* searchGenerator(sortedArray, elToFind) {
-  let awaitTime = window.delayTime;
+  let awaitTime = getDelayTime();
   var lowIndex = 0;
   var highIndex = sortedArray.length - 1;
   while (lowIndex <= highIndex) {
@@ -189,7 +191,7 @@ async function animate() {
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
   midPointer.childNodes[0].innerText = `${elToFind}?`;
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
     if (!window.animationStart) {
       return;
@@ -204,32 +206,32 @@ async function animate() {
       let lowPos = getElementPosition(low);
       let highPos = getElementPosition(high);
       let midPos = getElementPosition(mid);
-      await delay(window.delayTime);
+      await delay(getDelayTime());
       if (moveLow) {
         startBlinkingRed(midPointer);
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
-        await delay(window.delayTime);
-        await delay(window.delayTime / 2);
+        await delay(getDelayTime());
+        await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else if (moveHigh) {
         startBlinkingRed(midPointer);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
-        await delay(window.delayTime);
-        await delay(window.delayTime / 2);
+        await delay(getDelayTime());
+        await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else if (found) {
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
         startBlinkingGreen(midPointer);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         lowPointer.style.display = "none";
         highPointer.style.display = "none";
       } else {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
     } else {
       console.log("not found");
@@ -239,7 +241,7 @@ async function animate() {
       midPointer.style.width = "auto";
       midPointer.childNodes[0].innerText = `${elToFind} is not present in array!`;
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
 }

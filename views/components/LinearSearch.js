@@ -2,7 +2,9 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  getDelayTime,
+  setDelayTime
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
@@ -43,9 +45,9 @@ const LinearSearch = {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
@@ -56,7 +58,7 @@ const LinearSearch = {
 };
 
 async function* searchGenerator(arr, elToFind) {
-  let awaitTime = window.delayTime;
+  let awaitTime = getDelayTime();
   for (var i = 0; i < arr.length; i++) {
     if (!window.animationStart) {
       break;
@@ -138,21 +140,22 @@ async function animate() {
     getElementPosition(0).left,
     getElementPosition(0).bottom
   );
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
     if (!window.animationStart) {
       return;
     }
     let { found, isPresent, el, i } = v.value;
     let { left, bottom } = getElementPosition(i);
+    startBlinkingRed(pointer);
     movePointer(pointer, left, bottom);
-    await delay(window.delayTime);
+    await delay(getDelayTime());
     if (found) {
       startBlinkingGreen(pointer);
     } else {
       startBlinkingRed(pointer);
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
 }
