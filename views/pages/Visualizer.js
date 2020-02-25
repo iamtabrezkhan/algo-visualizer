@@ -2,7 +2,7 @@ import BubbleSort from "../components/BubbleSort.js";
 import SelectionSort from "../components/SelectionSort.js";
 import LinearSearch from "../components/LinearSearch.js";
 import BinarySearch from "../components/BinarySearch.js";
-import { checkIfAlreadyMounted } from "../../utils/common.js";
+import { checkIfAlreadyMounted, insertComponent } from "../../utils/common.js";
 
 const Visualizer = {
   render: async function() {
@@ -43,25 +43,26 @@ function changeAlgo(e) {
   let oldButton = document.querySelector(".active-algo-type");
   oldButton.classList.remove("active-algo-type");
   selectedButton.classList.add("active-algo-type");
+  let algoContainer = document.querySelector(".algo-container .wrapper");
   switch (selectedAlgo) {
     case "bubble": {
       // render bubble sort component
-      mountSelectedAlgo(BubbleSort);
+      insertComponent(algoContainer, BubbleSort);
       break;
     }
     case "selection": {
       // render selection sort component
-      mountSelectedAlgo(SelectionSort);
+      insertComponent(algoContainer, SelectionSort);
       break;
     }
     case "linearSearch": {
       // render linear search component
-      mountSelectedAlgo(LinearSearch);
+      insertComponent(algoContainer, LinearSearch);
       break;
     }
     case "binarySearch": {
       // render linear search component
-      mountSelectedAlgo(BinarySearch);
+      insertComponent(algoContainer, BinarySearch);
       break;
     }
     default: {

@@ -1,7 +1,36 @@
+import { getDelayTime } from "./common.js";
+
 /*
 =============================================================================
 utilities functions that are common to sorting algorithms
 */
+
+let barWidth = 20;
+let dataset = {
+  small: 10,
+  large: 20,
+  selected: "small"
+};
+
+export function getDatasetSize() {
+  return dataset[dataset.selected];
+}
+
+export function setDatasetSize(v) {
+  dataset.selected = v;
+}
+
+export function getSelectedDatasetType() {
+  return dataset.selected;
+}
+
+export function setBarWidth(width) {
+  barWidth = width;
+}
+
+export function getBarWidth() {
+  return barWidth;
+}
 
 export function addSwappingColors(barX, barY) {
   barX.classList.add("swapping");
@@ -18,8 +47,8 @@ export function removeSwappingColors() {
 export function swapBars(barX, barY, x, y) {
   let barXContainer = barX.parentElement;
   let barYContainer = barY.parentElement;
-  barXContainer.style.transitionDuration = `${window.delayTime}ms`;
-  barYContainer.style.transitionDuration = `${window.delayTime}ms`;
+  barXContainer.style.transitionDuration = `${getDelayTime()}ms`;
+  barYContainer.style.transitionDuration = `${getDelayTime()}ms`;
   let barXContainerLeft = barXContainer.style.left;
   let barYContainerLeft = barYContainer.style.left;
   barXContainer.style.left = barYContainerLeft;

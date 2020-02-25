@@ -2,14 +2,23 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  getDelayTime,
+  setDelayTime,
+  startAnimation,
+  isAnimating,
+  stopAnimation
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
   createAndInsertPointer,
   movePointer,
   startBlinkingGreen,
-  startBlinkingRed
+  startBlinkingRed,
+  getElementWidth,
+  getSelectedDatasetType,
+  getDatasetSize,
+  setDatasetSize
 } from "../../utils/searching.js";
 
 const BinarySearch = {
@@ -30,6 +39,8 @@ const BinarySearch = {
                 <button class="randomizeBtn">Randomize</button>
                 <input type="range" name="speed" id="speedBtn" min="100" max="5000">
                 <input type="text" name="searchElement" id="searchElement" placeholder="Search element here...">
+                <button class="smallDatasetBtn">Small Dataset</button>
+                <button class="largeDatasetBtn">Large Dataset</button>
               </div>
             </div>
           <div>
@@ -37,26 +48,42 @@ const BinarySearch = {
     return view;
   },
   componentDidMount: async function() {
-    window.animationStart = false;
+    stopAnimation();
     console.log(`Binary Search Mounted`);
-    generateRandomElements(window.elementWidth);
+    generateRandomElements(getElementWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
-      generateRandomElements(window.elementWidth);
+      generateRandomElements(getElementWidth());
+    });
+    smallDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "small") {
+        return;
+      }
+      setDatasetSize("small");
+      generateRandomElements(getElementWidth());
+    });
+    largeDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "large") {
+        return;
+      }
+      setDatasetSize("large");
+      generateRandomElements(getElementWidth());
     });
   },
   name: "binarySearch"
 };
 
 async function* searchGenerator(sortedArray, elToFind) {
-  let awaitTime = window.delayTime;
+  let awaitTime = getDelayTime();
   var lowIndex = 0;
   var highIndex = sortedArray.length - 1;
   while (lowIndex <= highIndex) {
@@ -105,7 +132,7 @@ function generateRandomElements(width) {
     ".algo-container .bars-container .wrapper"
   );
   boxesContainer.innerHTML = "";
-  window.randomArray = generateRandomArray(12, 40);
+  window.randomArray = generateRandomArray(getDatasetSize(), 40);
   window.randomArray = window.randomArray.sort((a, b) => a - b);
   window.randomArray.forEach((v, i) => {
     createAndInsertElement(boxesContainer, width, v, i);
@@ -180,18 +207,18 @@ function getElementToSearch() {
 
 async function animate() {
   let elToFind = getElementToSearch();
-  if (!elToFind || Number.isNaN(elToFind)) {
+  if (Number.isNaN(elToFind)) {
     return;
   }
   removeOldThreePointers();
   let { midPointer, lowPointer, highPointer } = generateThreePointers();
-  window.animationStart = true;
+  startAnimation();
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
   midPointer.childNodes[0].innerText = `${elToFind}?`;
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
-    if (!window.animationStart) {
+    if (!isAnimating()) {
       return;
     }
     let { found, low, high, mid, moveLow, moveHigh } = v.value;
@@ -204,32 +231,32 @@ async function animate() {
       let lowPos = getElementPosition(low);
       let highPos = getElementPosition(high);
       let midPos = getElementPosition(mid);
-      await delay(window.delayTime);
+      await delay(getDelayTime());
       if (moveLow) {
         startBlinkingRed(midPointer);
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
-        await delay(window.delayTime);
-        await delay(window.delayTime / 2);
+        await delay(getDelayTime());
+        await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else if (moveHigh) {
         startBlinkingRed(midPointer);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
-        await delay(window.delayTime);
-        await delay(window.delayTime / 2);
+        await delay(getDelayTime());
+        await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else if (found) {
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
         startBlinkingGreen(midPointer);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         lowPointer.style.display = "none";
         highPointer.style.display = "none";
       } else {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
     } else {
       console.log("not found");
@@ -239,7 +266,7 @@ async function animate() {
       midPointer.style.width = "auto";
       midPointer.childNodes[0].innerText = `${elToFind} is not present in array!`;
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
 }

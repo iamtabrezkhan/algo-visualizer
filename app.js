@@ -3,9 +3,6 @@ import router from "./js/router.js";
 
 let contentDiv = getElementById("content");
 
-window.delayTime = 800;
-window.barWidth = 20;
-window.elementWidth = 50;
 window.animationStart = false;
 
 // init router function and pass contentDiv element in which we want to append our pages. ================

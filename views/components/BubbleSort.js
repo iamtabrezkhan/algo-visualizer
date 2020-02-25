@@ -2,13 +2,22 @@ import {
   generateRandomArray,
   delay,
   disableActionButtons,
-  enableActionButtons
+  enableActionButtons,
+  setDelayTime,
+  getDelayTime,
+  startAnimation,
+  isAnimating,
+  stopAnimation
 } from "../../utils/common.js";
 import {
   addSwappingColors,
   removeSwappingColors,
   swapBars,
-  createAndInsertBar
+  createAndInsertBar,
+  getBarWidth,
+  getDatasetSize,
+  setDatasetSize,
+  getSelectedDatasetType
 } from "../../utils/sorting.js";
 
 const BubbleSort = {
@@ -28,6 +37,8 @@ const BubbleSort = {
                 <button class="animateBtn">Animate</button>
                 <button class="randomizeBtn">Randomize</button>
                 <input type="range" name="speed" id="speedBtn" min="100" max="5000">
+                <button class="smallDatasetBtn">Small Dataset</button>
+                <button class="largeDatasetBtn">Large Dataset</button>
               </div>
             </div>
           <div>
@@ -35,20 +46,36 @@ const BubbleSort = {
     return view;
   },
   componentDidMount: async function() {
-    window.animationStart = false;
+    stopAnimation();
     console.log(`Bubble Sort Mounted`);
-    generateRandomBars(window.barWidth);
+    generateRandomBars(getBarWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
-    speedButton.value = window.delayTime;
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
+    speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
-      window.delayTime = parseInt(e.target.value);
+      setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
-      window.randomArray = generateRandomArray(5, 40);
-      generateRandomBars(window.barWidth);
+      window.randomArray = generateRandomArray(getDatasetSize(), 40);
+      generateRandomBars(getBarWidth());
+    });
+    smallDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "small") {
+        return;
+      }
+      setDatasetSize("small");
+      generateRandomBars(getBarWidth());
+    });
+    largeDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "large") {
+        return;
+      }
+      setDatasetSize("large");
+      generateRandomBars(getBarWidth());
     });
   },
   name: "bubbleSort"
@@ -57,10 +84,6 @@ const BubbleSort = {
 async function* sortGenerator(arr) {
   let swapped;
   do {
-    if (!window.animationStart) {
-      console.log("stop bubble sort animation");
-      break;
-    }
     swapped = false;
     let awaitTime = 0;
     for (let i = 0; i < arr.length; i++) {
@@ -79,7 +102,7 @@ async function* sortGenerator(arr) {
 }
 
 function generateRandomBars(width) {
-  window.randomArray = generateRandomArray(5, 40);
+  window.randomArray = generateRandomArray(getDatasetSize(), 40);
   let barsContainer = document.querySelector(
     ".algo-container .bars-container .wrapper"
   );
@@ -93,12 +116,12 @@ function generateRandomBars(width) {
 }
 
 async function animate() {
-  window.animationStart = true;
+  startAnimation();
   disableActionButtons();
   let sorter = sortGenerator(window.randomArray);
-  let v = await sorter.next(window.delayTime);
+  let v = await sorter.next(getDelayTime());
   while (!v.done) {
-    if (!window.animationStart) {
+    if (!isAnimating()) {
       return;
     }
     let { x, y, canSwap } = v.value;
@@ -108,14 +131,14 @@ async function animate() {
       let barY = document.querySelector(`.bubbleSort .bar${y}`);
       addSwappingColors(barX, barY);
       if (canSwap) {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
         swapBars(barX, barY, x, y);
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       } else {
-        await delay(window.delayTime);
+        await delay(getDelayTime());
       }
     }
-    v = await sorter.next(window.delayTime);
+    v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
 }
