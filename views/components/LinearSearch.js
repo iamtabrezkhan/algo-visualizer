@@ -4,14 +4,21 @@ import {
   disableActionButtons,
   enableActionButtons,
   getDelayTime,
-  setDelayTime
+  setDelayTime,
+  startAnimation,
+  stopAnimation,
+  isAnimating
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
   createAndInsertPointer,
   movePointer,
   startBlinkingGreen,
-  startBlinkingRed
+  startBlinkingRed,
+  getElementWidth,
+  getSelectedDatasetType,
+  getDatasetSize,
+  setDatasetSize
 } from "../../utils/searching.js";
 
 const LinearSearch = {
@@ -32,6 +39,8 @@ const LinearSearch = {
                 <button class="randomizeBtn">Randomize</button>
                 <input type="range" name="speed" id="speedBtn" min="100" max="5000">
                 <input type="text" name="searchElement" id="searchElement" placeholder="Search element here...">
+                <button class="smallDatasetBtn">Small Dataset</button>
+                <button class="largeDatasetBtn">Large Dataset</button>
               </div>
             </div>
           <div>
@@ -39,19 +48,35 @@ const LinearSearch = {
     return view;
   },
   componentDidMount: async function() {
-    window.animationStart = false;
+    stopAnimation();
     console.log(`Linear Search Mounted`);
-    generateRandomElements(window.elementWidth);
+    generateRandomElements(getElementWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
     speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
       setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
-      generateRandomElements(window.elementWidth);
+      generateRandomElements(getElementWidth());
+    });
+    smallDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "small") {
+        return;
+      }
+      setDatasetSize("small");
+      generateRandomElements(getElementWidth());
+    });
+    largeDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "large") {
+        return;
+      }
+      setDatasetSize("large");
+      generateRandomElements(getElementWidth());
     });
   },
   name: "linearSearch"
@@ -60,9 +85,6 @@ const LinearSearch = {
 async function* searchGenerator(arr, elToFind) {
   let awaitTime = getDelayTime();
   for (var i = 0; i < arr.length; i++) {
-    if (!window.animationStart) {
-      break;
-    }
     if (arr[i] == elToFind) {
       awaitTime = yield {
         found: true,
@@ -94,7 +116,7 @@ function generateRandomElements(width) {
     ".algo-container .bars-container .wrapper"
   );
   boxesContainer.innerHTML = "";
-  window.randomArray = generateRandomArray(5, 40);
+  window.randomArray = generateRandomArray(getDatasetSize(), 40);
   window.randomArray.forEach((v, i) => {
     createAndInsertElement(boxesContainer, width, v, i);
   });
@@ -128,10 +150,10 @@ function getElementToSearch() {
 
 async function animate() {
   let elToFind = getElementToSearch();
-  if (!elToFind || Number.isNaN(elToFind)) {
+  if (Number.isNaN(elToFind)) {
     return;
   }
-  window.animationStart = true;
+  startAnimation();
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
   removePointer();
@@ -142,7 +164,7 @@ async function animate() {
   );
   let v = await sorter.next(getDelayTime());
   while (!v.done) {
-    if (!window.animationStart) {
+    if (!isAnimating()) {
       return;
     }
     let { found, isPresent, el, i } = v.value;

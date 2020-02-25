@@ -5,6 +5,33 @@ import { getDelayTime } from "./common.js";
 utilities functions that are common to searching algorithms
 */
 
+let elementWidth = 50;
+let dataset = {
+  small: 6,
+  large: 12,
+  selected: "small"
+};
+
+export function getDatasetSize() {
+  return dataset[dataset.selected];
+}
+
+export function setDatasetSize(v) {
+  dataset.selected = v;
+}
+
+export function getSelectedDatasetType() {
+  return dataset.selected;
+}
+
+export function setElementWidth(width) {
+  elementWidth = width;
+}
+
+export function getElementWidth() {
+  return elementWidth;
+}
+
 export function createAndInsertElement(container, width, value, index) {
   let elementBox = document.createElement("div");
   elementBox.className = `box${index} el-box`;
@@ -23,7 +50,7 @@ export function createAndInsertPointer(text, left, bottom) {
   let wrapper = document.createElement("div");
   wrapper.className = "wrapper";
   pointer.appendChild(wrapper);
-  pointer.style.width = `${window.elementWidth}px`;
+  pointer.style.width = `${getElementWidth()}px`;
   pointer.style.left = `${left}px`;
   pointer.style.bottom = `${bottom + 35}px`;
   pointer.childNodes[0].innerText = text;

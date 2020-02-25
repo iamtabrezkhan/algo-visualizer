@@ -5,6 +5,33 @@ import { getDelayTime } from "./common.js";
 utilities functions that are common to sorting algorithms
 */
 
+let barWidth = 20;
+let dataset = {
+  small: 10,
+  large: 20,
+  selected: "small"
+};
+
+export function getDatasetSize() {
+  return dataset[dataset.selected];
+}
+
+export function setDatasetSize(v) {
+  dataset.selected = v;
+}
+
+export function getSelectedDatasetType() {
+  return dataset.selected;
+}
+
+export function setBarWidth(width) {
+  barWidth = width;
+}
+
+export function getBarWidth() {
+  return barWidth;
+}
+
 export function addSwappingColors(barX, barY) {
   barX.classList.add("swapping");
   barY.classList.add("swapping");

@@ -4,14 +4,21 @@ import {
   disableActionButtons,
   enableActionButtons,
   getDelayTime,
-  setDelayTime
+  setDelayTime,
+  startAnimation,
+  isAnimating,
+  stopAnimation
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
   createAndInsertPointer,
   movePointer,
   startBlinkingGreen,
-  startBlinkingRed
+  startBlinkingRed,
+  getElementWidth,
+  getSelectedDatasetType,
+  getDatasetSize,
+  setDatasetSize
 } from "../../utils/searching.js";
 
 const BinarySearch = {
@@ -32,6 +39,8 @@ const BinarySearch = {
                 <button class="randomizeBtn">Randomize</button>
                 <input type="range" name="speed" id="speedBtn" min="100" max="5000">
                 <input type="text" name="searchElement" id="searchElement" placeholder="Search element here...">
+                <button class="smallDatasetBtn">Small Dataset</button>
+                <button class="largeDatasetBtn">Large Dataset</button>
               </div>
             </div>
           <div>
@@ -39,19 +48,35 @@ const BinarySearch = {
     return view;
   },
   componentDidMount: async function() {
-    window.animationStart = false;
+    stopAnimation();
     console.log(`Binary Search Mounted`);
-    generateRandomElements(window.elementWidth);
+    generateRandomElements(getElementWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let speedButton = document.querySelector("#speedBtn");
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
     speedButton.value = getDelayTime();
     speedButton.addEventListener("change", function(e) {
       setDelayTime(parseInt(e.target.value));
     });
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
-      generateRandomElements(window.elementWidth);
+      generateRandomElements(getElementWidth());
+    });
+    smallDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "small") {
+        return;
+      }
+      setDatasetSize("small");
+      generateRandomElements(getElementWidth());
+    });
+    largeDatasetButton.addEventListener("click", function() {
+      if (getSelectedDatasetType() === "large") {
+        return;
+      }
+      setDatasetSize("large");
+      generateRandomElements(getElementWidth());
     });
   },
   name: "binarySearch"
@@ -107,7 +132,7 @@ function generateRandomElements(width) {
     ".algo-container .bars-container .wrapper"
   );
   boxesContainer.innerHTML = "";
-  window.randomArray = generateRandomArray(12, 40);
+  window.randomArray = generateRandomArray(getDatasetSize(), 40);
   window.randomArray = window.randomArray.sort((a, b) => a - b);
   window.randomArray.forEach((v, i) => {
     createAndInsertElement(boxesContainer, width, v, i);
@@ -182,18 +207,18 @@ function getElementToSearch() {
 
 async function animate() {
   let elToFind = getElementToSearch();
-  if (!elToFind || Number.isNaN(elToFind)) {
+  if (Number.isNaN(elToFind)) {
     return;
   }
   removeOldThreePointers();
   let { midPointer, lowPointer, highPointer } = generateThreePointers();
-  window.animationStart = true;
+  startAnimation();
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
   midPointer.childNodes[0].innerText = `${elToFind}?`;
   let v = await sorter.next(getDelayTime());
   while (!v.done) {
-    if (!window.animationStart) {
+    if (!isAnimating()) {
       return;
     }
     let { found, low, high, mid, moveLow, moveHigh } = v.value;

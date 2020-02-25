@@ -7,6 +7,19 @@ utilities functions that are common to multiple components
  * animation speed in milliseconds
  */
 let delayTime = 800;
+let animationStart = false;
+
+export function isAnimating() {
+  return animationStart !== false;
+}
+
+export function startAnimation() {
+  animationStart = true;
+}
+
+export function stopAnimation() {
+  animationStart = false;
+}
 
 export function getElementById(id) {
   return document.getElementById(id);
@@ -115,9 +128,13 @@ export function disableActionButtons() {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let searchInput = document.querySelector("#searchElement");
-    animateButton.disabled = true;
-    randomizeButton.disabled = true;
-    searchInput.disabled = true;
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
+    if (animateButton) animateButton.disabled = true;
+    if (randomizeButton) randomizeButton.disabled = true;
+    if (searchInput) searchInput.disabled = true;
+    if (smallDatasetButton) smallDatasetButton.disabled = true;
+    if (largeDatasetButton) largeDatasetButton.disabled = true;
   } catch (error) {
     console.warn(error);
   }
@@ -131,9 +148,13 @@ export function enableActionButtons() {
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
     let searchInput = document.querySelector("#searchElement");
-    animateButton.disabled = false;
-    randomizeButton.disabled = false;
-    searchInput.disabled = false;
+    let smallDatasetButton = document.querySelector(".smallDatasetBtn");
+    let largeDatasetButton = document.querySelector(".largeDatasetBtn");
+    if (animateButton) animateButton.disabled = false;
+    if (randomizeButton) randomizeButton.disabled = false;
+    if (searchInput) searchInput.disabled = false;
+    if (smallDatasetButton) smallDatasetButton.disabled = false;
+    if (largeDatasetButton) largeDatasetButton.disabled = false;
   } catch (error) {
     console.warn(error);
   }
