@@ -173,6 +173,8 @@ export function getTime(currentTimestamp = Date.now(), type = "24") {
       let hours = today.getHours();
       let minutes = today.getMinutes();
       let seconds = today.getSeconds();
+      hours = hours < 10 ? `0${hours}` : hours;
+      minutes = minutes < 10 ? `0${minutes}` : minutes;
       seconds = seconds < 10 ? `0${seconds}` : seconds;
       return `${hours}:${minutes}:${seconds}`;
     }
