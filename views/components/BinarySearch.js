@@ -7,7 +7,8 @@ import {
   setDelayTime,
   startAnimation,
   isAnimating,
-  stopAnimation
+  stopAnimation,
+  executionLog
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
@@ -48,8 +49,11 @@ const BinarySearch = {
     return view;
   },
   componentDidMount: async function() {
-    stopAnimation();
-    console.log(`Binary Search Mounted`);
+    if (isAnimating()) {
+      executionLog("binary-search", "Visualization stopped...", "error");
+      stopAnimation();
+    }
+    executionLog("binary-search", "Binary search mounted", "normal");
     generateRandomElements(getElementWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
@@ -63,6 +67,7 @@ const BinarySearch = {
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
       generateRandomElements(getElementWidth());
+      executionLog("binary-search", "Dataset randomized", "success");
     });
     smallDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "small") {
@@ -70,6 +75,7 @@ const BinarySearch = {
       }
       setDatasetSize("small");
       generateRandomElements(getElementWidth());
+      executionLog("binary-search", "Dataset changed to small", "success");
     });
     largeDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "large") {
@@ -77,6 +83,7 @@ const BinarySearch = {
       }
       setDatasetSize("large");
       generateRandomElements(getElementWidth());
+      executionLog("binary-search", "Dataset changed to large", "success");
     });
   },
   name: "binarySearch"
@@ -105,7 +112,10 @@ async function* searchGenerator(sortedArray, elToFind) {
         high: highIndex,
         mid: Math.floor((midIndex + 1 + highIndex) / 2),
         moveLow: true,
-        moveHigh: false
+        moveHigh: false,
+        lowIndex: lowIndex,
+        midIndex: midIndex,
+        highIndex: highIndex
       };
       lowIndex = midIndex + 1;
     } else {
@@ -115,16 +125,19 @@ async function* searchGenerator(sortedArray, elToFind) {
         high: midIndex - 1,
         mid: Math.floor((lowIndex + midIndex - 1) / 2),
         moveLow: false,
-        moveHigh: true
+        moveHigh: true,
+        lowIndex: lowIndex,
+        midIndex: midIndex,
+        highIndex: highIndex
       };
       highIndex = midIndex - 1;
     }
   }
-  yield {
-    found: false,
-    moveHigh: false,
-    moveLow: false
-  };
+  // yield {
+  //   found: false,
+  //   moveHigh: false,
+  //   moveLow: false
+  // };
 }
 
 function generateRandomElements(width) {
@@ -211,6 +224,7 @@ async function animate() {
     return;
   }
   removeOldThreePointers();
+  executionLog("binary-search", "Visualization started...", "success");
   let { midPointer, lowPointer, highPointer } = generateThreePointers();
   startAnimation();
   disableActionButtons();
@@ -221,7 +235,17 @@ async function animate() {
     if (!isAnimating()) {
       return;
     }
-    let { found, low, high, mid, moveLow, moveHigh } = v.value;
+    let {
+      found,
+      low,
+      high,
+      mid,
+      moveLow,
+      moveHigh,
+      lowIndex,
+      midIndex,
+      highIndex
+    } = v.value;
     if (
       low >= 0 &&
       low <= window.randomArray.length - 1 &&
@@ -233,13 +257,22 @@ async function animate() {
       let midPos = getElementPosition(mid);
       await delay(getDelayTime());
       if (moveLow) {
+        executionLog("binary-search", `low index is ${lowIndex}`);
+        executionLog("binary-search", `mid index is ${midIndex}`);
+        executionLog("binary-search", `high index is ${highIndex}`);
         startBlinkingRed(midPointer);
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
         await delay(getDelayTime());
         await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
         await delay(getDelayTime());
+        executionLog("binary-search", `low index is ${low}`);
+        executionLog("binary-search", `mid index is ${mid}`);
+        executionLog("binary-search", `high index is ${highIndex}`);
       } else if (moveHigh) {
+        executionLog("binary-search", `low index is ${lowIndex}`);
+        executionLog("binary-search", `mid index is ${midIndex}`);
+        executionLog("binary-search", `high index is ${highIndex}`);
         startBlinkingRed(midPointer);
         await delay(getDelayTime());
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
@@ -247,11 +280,19 @@ async function animate() {
         await delay(getDelayTime() / 2);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
         await delay(getDelayTime());
+        executionLog("binary-search", `low index is ${lowIndex}`);
+        executionLog("binary-search", `mid index is ${mid}`);
+        executionLog("binary-search", `high index is ${high}`);
       } else if (found) {
         movePointer(lowPointer, lowPos.left, lowPos.bottom - 35);
         movePointer(highPointer, highPos.left, highPos.bottom - 35);
         movePointer(midPointer, midPos.left, midPos.bottom - 35);
         startBlinkingGreen(midPointer);
+        executionLog(
+          "binary-search",
+          `${elToFind} found at index ${mid}`,
+          "success"
+        );
         await delay(getDelayTime());
         lowPointer.style.display = "none";
         highPointer.style.display = "none";
@@ -259,12 +300,14 @@ async function animate() {
         await delay(getDelayTime());
       }
     } else {
-      console.log("not found");
       lowPointer.style.display = "none";
       highPointer.style.display = "none";
       startBlinkingRed(midPointer);
-      midPointer.style.width = "auto";
-      midPointer.childNodes[0].innerText = `${elToFind} is not present in array!`;
+      executionLog(
+        "binary-search",
+        `${elToFind} is not present in the array`,
+        "error"
+      );
     }
     v = await sorter.next(getDelayTime());
   }

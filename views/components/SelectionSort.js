@@ -7,7 +7,8 @@ import {
   setDelayTime,
   startAnimation,
   stopAnimation,
-  isAnimating
+  isAnimating,
+  executionLog
 } from "../../utils/common.js";
 import {
   addSwappingColors,
@@ -45,7 +46,11 @@ const SelectionSort = {
     return view;
   },
   componentDidMount: function() {
-    stopAnimation();
+    if (isAnimating()) {
+      executionLog("selection-sort", "Visualization stopped...", "error");
+      stopAnimation();
+    }
+    executionLog("selection-sort", "Selection sort mounted");
     generateRandomBars(getBarWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
@@ -60,6 +65,7 @@ const SelectionSort = {
     randomizeButton.addEventListener("click", function() {
       window.randomArray = generateRandomArray(getDatasetSize(), 40);
       generateRandomBars(getBarWidth());
+      executionLog("selection-sort", "Dataset randomized", "success");
     });
     smallDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "small") {
@@ -67,6 +73,7 @@ const SelectionSort = {
       }
       setDatasetSize("small");
       generateRandomBars(getBarWidth());
+      executionLog("selection-sort", "Dataset changed to small", "success");
     });
     largeDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "large") {
@@ -74,6 +81,7 @@ const SelectionSort = {
       }
       setDatasetSize("large");
       generateRandomBars(getBarWidth());
+      executionLog("selection-sort", "Dataset changed to large", "success");
     });
   },
   name: "selectionSort"
@@ -89,7 +97,10 @@ async function* sortGenerator(arr) {
           min: min,
           y: j,
           canSwap: false,
-          changeMin: true
+          changeMin: true,
+          el1: arr[min],
+          el2: arr[j],
+          minEl: arr[j]
         };
         min = j;
       } else {
@@ -97,7 +108,10 @@ async function* sortGenerator(arr) {
           min: min,
           y: j,
           canSwap: false,
-          changeMin: false
+          changeMin: false,
+          el1: arr[min],
+          el2: arr[j],
+          minEl: arr[min]
         };
       }
       await delay(awaitTime);
@@ -110,14 +124,20 @@ async function* sortGenerator(arr) {
         min: min,
         y: i,
         canSwap: true,
-        changeMin: false
+        changeMin: false,
+        el1: arr[i],
+        el2: arr[min],
+        minEl: arr[i + 1]
       };
     } else {
       awaitTime = yield {
         min: min,
         y: i + 1,
         canSwap: false,
-        changeMin: true
+        changeMin: true,
+        minEl: arr[i + 1],
+        el1: arr[min],
+        el2: arr[i]
       };
     }
     await delay(awaitTime);
@@ -161,6 +181,7 @@ async function animate() {
   startAnimation();
   disableActionButtons();
   removeMinPointer();
+  executionLog("selection-sort", "Visualization started...", "success");
   let minPointer = generateMinPointerElement();
   let barsContainer = document.querySelector(
     ".algo-container .bars-container .wrapper"
@@ -172,21 +193,28 @@ async function animate() {
     if (!isAnimating()) {
       return;
     }
-    let { min, y, canSwap, changeMin } = v.value;
+    let { min, y, canSwap, changeMin, el1, el2, minEl } = v.value;
     removeSwappingColors();
     if (y < window.randomArray.length) {
       let barX = document.querySelector(`.selectionSort .bar${min}`);
       let barY = document.querySelector(`.selectionSort .bar${y}`);
       addSwappingColors(barX, barY);
+      if (!canSwap) {
+        executionLog("selection-sort", `Comparing ${el1} & ${el2}`);
+        await delay(getDelayTime());
+      }
       if (canSwap) {
+        executionLog("selection-sort", `Swapping ${el1} & ${el2}...`);
         swapBars(barX, barY, min, y);
         await delay(getDelayTime());
+        executionLog("selection-sort", `Changing minimum to ${minEl}`);
         minPointer.style.left = `${getBarWidth() * y + 20}px`;
         await delay(getDelayTime());
       } else {
         await delay(getDelayTime());
       }
       if (changeMin) {
+        executionLog("selection-sort", `Changing minimum to ${minEl}`);
         minPointer.style.transitionDuration = `${getDelayTime()}ms`;
         minPointer.style.left = `${parseInt(barY.parentElement.style.left) -
           10}px`;
@@ -195,6 +223,7 @@ async function animate() {
     }
     v = await sorter.next(getDelayTime());
   }
+  executionLog("selection-sort", `Array is now sorted`, "success");
   enableActionButtons();
   removeSwappingColors();
 }

@@ -2,7 +2,12 @@ import BubbleSort from "../components/BubbleSort.js";
 import SelectionSort from "../components/SelectionSort.js";
 import LinearSearch from "../components/LinearSearch.js";
 import BinarySearch from "../components/BinarySearch.js";
-import { checkIfAlreadyMounted, insertComponent } from "../../utils/common.js";
+import ExecutionLogs from "../components/ExecutionLogs.js";
+import {
+  checkIfAlreadyMounted,
+  insertComponent,
+  executionLog
+} from "../../utils/common.js";
 
 const Visualizer = {
   render: async function() {
@@ -21,14 +26,22 @@ const Visualizer = {
                                 
                         </div>
                   </div>
+                  <div id="execution-logs-container">
+                        <div class="wrapper">
+                                
+                        </div>
+                  </div>
           </div>
         <div>`;
     return view;
   },
   componentDidMount: function() {
-    // global so that we can access it anywhere
-    window.selectedAlgo = "bubbleSort";
-    mountSelectedAlgo(BubbleSort);
+    let executionLogsContainer = document.getElementById(
+      "execution-logs-container"
+    );
+    let algoContainer = document.querySelector(".algo-container .wrapper");
+    insertComponent(executionLogsContainer, ExecutionLogs);
+    insertComponent(algoContainer, BubbleSort);
     let algoButtons = document.querySelectorAll(".types button");
     for (let i = 0; i < algoButtons.length; i++) {
       algoButtons[i].addEventListener("click", changeAlgo);
@@ -77,6 +90,7 @@ async function mountSelectedAlgo(algoComponent) {
     let algoContainer = document.querySelector(".algo-container .wrapper");
     algoContainer.innerHTML = await algoComponent.render();
     algoComponent.componentDidMount();
+    executionLog(algoComponent.name, `${algoComponent.name} mounted...`);
   }
 }
 

@@ -215,6 +215,113 @@
   animation: greenBlinker 0.2s linear infinite alternate;
 }
 
+.visualizer #execution-logs-container {
+  padding: 15px 0;
+}
+
+.visualizer #execution-logs-container .executionLogs > .title {
+  padding: 5px 5px;
+  width: calc(100% - 10px);
+  font-weight: bold;
+  font-size: 0.8rem;
+  background: var(--color-gray);
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.visualizer #execution-logs-container .executionLogs > .title > button {
+  padding: 0;
+  background: none;
+  border: none;
+  text-transform: none;
+  letter-spacing: 0;
+  color: white;
+  text-decoration: underline;
+  margin-left: auto;
+  font-size: 0.7rem;
+}
+
+.visualizer #execution-logs-container .executionLogs > .title > i {
+  cursor: pointer;
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+.visualizer #execution-logs-container .executionLogs > .title > .plus {
+  display: none;
+}
+
+.visualizer #execution-logs-container .executionLogs > .execution-container {
+  background: var(--color-exec-bg);
+  width: calc(100% - 20px);
+  padding: 5px 10px;
+  height: 300px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+  text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container::-webkit-scrollbar-track {
+  background: #aaa;
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container::-webkit-scrollbar-thumb {
+  background: var(--color-gray);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background-clip: content-box;
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container
+  > .log
+  > span {
+  padding-right: 5px;
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container
+  > .log
+  > .host {
+  color: var(--color-exec-host);
+  font-weight: bold;
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container
+  > .log
+  > .time {
+  color: var(--color-exec-time);
+}
+
+.visualizer
+  #execution-logs-container
+  .executionLogs
+  > .execution-container
+  > .log
+  > .log-text {
+}
+
 @keyframes redBlinker {
   from {
     background: var(--color-gray);
