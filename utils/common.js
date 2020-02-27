@@ -9,6 +9,12 @@ utilities functions that are common to multiple components
 let delayTime = 800;
 let animationStart = false;
 
+let colors = {
+  textNormal: "#ffffff",
+  textSuccess: "#00ff04",
+  textError: "#ff3a3a"
+};
+
 export function isAnimating() {
   return animationStart !== false;
 }
@@ -157,5 +163,79 @@ export function enableActionButtons() {
     if (largeDatasetButton) largeDatasetButton.disabled = false;
   } catch (error) {
     console.warn(error);
+  }
+}
+
+export function getTime(currentTimestamp = Date.now(), type = "24") {
+  switch (type) {
+    case "24": {
+      let today = new Date(currentTimestamp);
+      let hours = today.getHours();
+      let minutes = today.getMinutes();
+      let seconds = today.getSeconds();
+      seconds = seconds < 10 ? `0${seconds}` : seconds;
+      return `${hours}:${minutes}:${seconds}`;
+    }
+    default: {
+      break;
+    }
+  }
+}
+
+export function generateLogElement(hostName, logText, type = "normal") {
+  let log = document.createElement("div");
+  log.className = "log";
+  let host = document.createElement("span");
+  host.className = "host";
+  host.innerText = `@${hostName}:`;
+  let time = document.createElement("span");
+  time.className = "time";
+  time.innerText = getTime();
+  let text = document.createElement("span");
+  text.innerText = logText;
+  text.className = "log-text";
+  text.style.color =
+    type === "normal"
+      ? colors.textNormal
+      : type === "success"
+      ? colors.textSuccess
+      : type === "error"
+      ? colors.textError
+      : "white";
+  log.appendChild(host);
+  log.appendChild(time);
+  log.appendChild(text);
+  return log;
+}
+
+export function executionLog(hostName, logText, type) {
+  let logContainer = document.querySelector(
+    ".executionLogs .execution-container"
+  );
+  let logEl = generateLogElement(hostName, logText, type);
+  logContainer.appendChild(logEl);
+  scrollContainerToBottom(logContainer);
+}
+
+export function clearLogs() {
+  let logContainer = document.querySelector(
+    ".executionLogs .execution-container"
+  );
+  logContainer.innerHTML = "";
+}
+
+export function userHasScrolledUp(container) {
+  let scrollTop = container.scrollTop;
+  let scrollHeight = container.scrollHeight;
+  if (scrollHeight - scrollTop - scrollTop > 20) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export function scrollContainerToBottom(container) {
+  if (!userHasScrolledUp(container)) {
+    container.scrollTo(0, container.scrollHeight);
   }
 }

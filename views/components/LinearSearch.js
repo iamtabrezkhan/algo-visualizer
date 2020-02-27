@@ -7,7 +7,8 @@ import {
   setDelayTime,
   startAnimation,
   stopAnimation,
-  isAnimating
+  isAnimating,
+  executionLog
 } from "../../utils/common.js";
 import {
   createAndInsertElement,
@@ -48,8 +49,11 @@ const LinearSearch = {
     return view;
   },
   componentDidMount: async function() {
-    stopAnimation();
-    console.log(`Linear Search Mounted`);
+    if (isAnimating()) {
+      executionLog("linear-search", "Visualization stopped...", "error");
+      stopAnimation();
+    }
+    executionLog("linear-search", "Linear search mounted", "normal");
     generateRandomElements(getElementWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
@@ -63,6 +67,7 @@ const LinearSearch = {
     animateButton.addEventListener("click", animate);
     randomizeButton.addEventListener("click", function() {
       generateRandomElements(getElementWidth());
+      executionLog("linear-search", "Dataset randomized", "success");
     });
     smallDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "small") {
@@ -70,6 +75,7 @@ const LinearSearch = {
       }
       setDatasetSize("small");
       generateRandomElements(getElementWidth());
+      executionLog("linear-search", "Dataset changed to small", "success");
     });
     largeDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "large") {
@@ -77,6 +83,7 @@ const LinearSearch = {
       }
       setDatasetSize("large");
       generateRandomElements(getElementWidth());
+      executionLog("linear-search", "Dataset changed to large", "success");
     });
   },
   name: "linearSearch"
@@ -153,6 +160,7 @@ async function animate() {
   if (Number.isNaN(elToFind)) {
     return;
   }
+  executionLog("linear-search", "Visualization started...", "success");
   startAnimation();
   disableActionButtons();
   let sorter = searchGenerator(window.randomArray, elToFind);
@@ -172,12 +180,23 @@ async function animate() {
     startBlinkingRed(pointer);
     movePointer(pointer, left, bottom);
     await delay(getDelayTime());
+    if (isPresent) {
+      executionLog("linear-search", `is ${el} equal to ${elToFind}?`);
+    }
     if (found) {
       startBlinkingGreen(pointer);
+      executionLog(
+        "linear-search",
+        `${elToFind} found at index: ${i}`,
+        "success"
+      );
     } else {
       startBlinkingRed(pointer);
     }
     v = await sorter.next(getDelayTime());
+    if (!isPresent) {
+      executionLog("linear-search", `${elToFind} is not in the array`, "error");
+    }
   }
   enableActionButtons();
 }

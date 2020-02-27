@@ -7,7 +7,8 @@ import {
   getDelayTime,
   startAnimation,
   isAnimating,
-  stopAnimation
+  stopAnimation,
+  executionLog
 } from "../../utils/common.js";
 import {
   addSwappingColors,
@@ -46,8 +47,11 @@ const BubbleSort = {
     return view;
   },
   componentDidMount: async function() {
-    stopAnimation();
-    console.log(`Bubble Sort Mounted`);
+    if (isAnimating()) {
+      executionLog("bubble-sort", "Visualization stopped...", "error");
+      stopAnimation();
+    }
+    executionLog("bubble-sort", "Bubble sort mounted");
     generateRandomBars(getBarWidth());
     let animateButton = document.querySelector(".animateBtn");
     let randomizeButton = document.querySelector(".randomizeBtn");
@@ -62,6 +66,7 @@ const BubbleSort = {
     randomizeButton.addEventListener("click", function() {
       window.randomArray = generateRandomArray(getDatasetSize(), 40);
       generateRandomBars(getBarWidth());
+      executionLog("bubble-sort", "Dataset randomized", "success");
     });
     smallDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "small") {
@@ -69,6 +74,7 @@ const BubbleSort = {
       }
       setDatasetSize("small");
       generateRandomBars(getBarWidth());
+      executionLog("bubble-sort", "Dataset changed to small", "success");
     });
     largeDatasetButton.addEventListener("click", function() {
       if (getSelectedDatasetType() === "large") {
@@ -76,6 +82,7 @@ const BubbleSort = {
       }
       setDatasetSize("large");
       generateRandomBars(getBarWidth());
+      executionLog("bubble-sort", "Dataset changed to large", "success");
     });
   },
   name: "bubbleSort"
@@ -92,9 +99,21 @@ async function* sortGenerator(arr) {
         arr[i] = arr[i + 1];
         arr[i + 1] = tmp;
         swapped = true;
-        awaitTime = yield { x: i, y: i + 1, canSwap: true };
+        awaitTime = yield {
+          x: i,
+          y: i + 1,
+          canSwap: true,
+          el1: arr[i + 1],
+          el2: arr[i]
+        };
       } else {
-        awaitTime = yield { x: i, y: i + 1, canSwap: false };
+        awaitTime = yield {
+          x: i,
+          y: i + 1,
+          canSwap: false,
+          el1: arr[i],
+          el2: arr[i + 1]
+        };
       }
       await delay(awaitTime);
     }
@@ -117,6 +136,7 @@ function generateRandomBars(width) {
 
 async function animate() {
   startAnimation();
+  executionLog("bubble-sort", "Visualization started...", "success");
   disableActionButtons();
   let sorter = sortGenerator(window.randomArray);
   let v = await sorter.next(getDelayTime());
@@ -124,13 +144,19 @@ async function animate() {
     if (!isAnimating()) {
       return;
     }
-    let { x, y, canSwap } = v.value;
+    let { x, y, canSwap, el1, el2 } = v.value;
     removeSwappingColors();
     if (y < window.randomArray.length) {
       let barX = document.querySelector(`.bubbleSort .bar${x}`);
       let barY = document.querySelector(`.bubbleSort .bar${y}`);
+      executionLog("bubble-sort", `Comparing ${el1} & ${el2}`);
       addSwappingColors(barX, barY);
+      await delay(getDelayTime());
       if (canSwap) {
+        executionLog(
+          "bubble-sort",
+          `${el1} is greater than ${el2}, swapping them...`
+        );
         await delay(getDelayTime());
         swapBars(barX, barY, x, y);
         await delay(getDelayTime());
@@ -141,6 +167,7 @@ async function animate() {
     v = await sorter.next(getDelayTime());
   }
   enableActionButtons();
+  executionLog("bubble-sort", "Array is now sorted", "success");
 }
 
 export default BubbleSort;

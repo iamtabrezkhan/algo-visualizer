@@ -5,7 +5,9 @@
   --color-light-pink: #ffa3b9;
   --color-light-gray: #7e7e7e;
   --color-gray: #333333;
-  --delay: 1000;
+  --color-exec-bg: #10476d;
+  --color-exec-host: #7ecaff;
+  --color-exec-time: #da80ff;
 }
 
 body {
@@ -16,6 +18,10 @@ body {
 
 .font-tomorrow {
   font-family: "Tomorrow", sans-serif;
+}
+
+.font-source-code {
+  font-family: "Source Code Pro";
 }
 
 main {

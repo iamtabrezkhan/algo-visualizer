@@ -1,4 +1,4 @@
-import { getDelayTime } from "./common.js";
+import { getDelayTime, executionLog } from "./common.js";
 
 /*
 =============================================================================
